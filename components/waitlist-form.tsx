@@ -84,7 +84,7 @@ export function WaitlistForm({ variant = "compact", location, submitLabel = "Zet
           placeholder="naam@voorbeeld.nl"
           aria-invalid={emailError || undefined}
           aria-describedby={`${emailError ? errorId : ""} ${noteId}`.trim()}
-          className={`h-12 w-full min-w-0 flex-1 rounded-md border bg-surface px-4 text-base text-fg placeholder:text-fg-subtle ${
+          className={`h-12 w-full min-w-0 rounded-md sm:flex-1 border bg-surface px-4 text-base text-fg placeholder:text-fg-subtle ${
             emailError ? "border-error" : "border-border-strong"
           }`}
         />

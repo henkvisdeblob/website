@@ -12,7 +12,7 @@ export function SiteHeader({ cta = true }: { cta?: boolean }) {
           <Logo />
         </Link>
         {cta && (
-          <ButtonLink href="/#wachtlijst" variant="secondary" className="h-10 px-4 text-sm">
+          <ButtonLink href="/#wachtlijst" variant="secondarySmall">
             Op de wachtlijst
           </ButtonLink>
         )}

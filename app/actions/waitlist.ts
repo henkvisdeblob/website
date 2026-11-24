@@ -18,7 +18,11 @@ export type JoinState =
   | { status: "success"; email: string }
   | { status: "error"; message: string; field?: "email" };
 
-const joinLimiter = createRateLimiter({ limit: 5, windowMs: 10 * 60 * 1000 });
+// Sign-ups per IP per 10 minutes. Overridable for end-to-end tests, which sign up many times from one IP.
+const joinLimiter = createRateLimiter({
+  limit: Number(process.env.WAITLIST_RATE_LIMIT ?? 5),
+  windowMs: 10 * 60 * 1000,
+});
 const tokenLimiter = createRateLimiter({ limit: 30, windowMs: 10 * 60 * 1000 });
 
 async function clientKey() {

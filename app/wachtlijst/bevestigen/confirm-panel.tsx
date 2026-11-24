@@ -112,7 +112,7 @@ function Confirmed({
             readOnly
             value={referralUrl}
             onFocus={(e) => e.currentTarget.select()}
-            className="h-12 w-full min-w-0 flex-1 rounded-md border border-border-strong bg-muted px-4 text-base text-fg"
+            className="h-12 w-full min-w-0 rounded-md sm:flex-1 border border-border-strong bg-muted px-4 text-base text-fg"
           />
           <button
             type="button"

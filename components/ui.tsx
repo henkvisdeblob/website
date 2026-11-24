@@ -7,11 +7,14 @@ export function Container({ className = "", ...props }: ComponentProps<"div">) {
 }
 
 const buttonBase =
-  "inline-flex h-12 items-center justify-center gap-2 rounded-md px-5 text-base font-semibold transition-colors disabled:pointer-events-none disabled:opacity-50";
+  "inline-flex items-center justify-center gap-2 rounded-md font-semibold transition-colors disabled:pointer-events-none disabled:opacity-50";
+const sizeMd = "h-12 px-5 text-base";
+const sizeSm = "h-10 px-4 text-sm";
 
 export const buttonStyles = {
-  primary: `${buttonBase} bg-primary text-on-primary hover:bg-primary-hover`,
-  secondary: `${buttonBase} border border-border-strong bg-surface text-fg hover:bg-muted`,
+  primary: `${buttonBase} ${sizeMd} bg-primary text-on-primary hover:bg-primary-hover`,
+  secondary: `${buttonBase} ${sizeMd} border border-border-strong bg-surface text-fg hover:bg-muted`,
+  secondarySmall: `${buttonBase} ${sizeSm} border border-border-strong bg-surface text-fg hover:bg-muted`,
   quiet: "inline-flex items-center gap-1 font-semibold text-primary underline-offset-4 hover:underline",
 } as const;
 

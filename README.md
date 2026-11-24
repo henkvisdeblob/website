@@ -4,7 +4,7 @@
 
 Potje is een Nederlandse website die huishoudens elke week een weekmenu en boodschappenlijst geeft, gebouwd rond de supermarktaanbiedingen van die week. Het menu blijft binnen je budget, gebruikt restjes slim en laat zien hoeveel je bespaart. Het verdienmodel is freemium met een Premium-abonnement.
 
-> **Status:** fase 0 (validatie). De productspecificatie is klaar; er is nog geen code. Zie [11 — Roadmap](docs/11-roadmap-en-validatie.md) voor de volgende stappen.
+> **Status:** fase 0 (validatie). De productspecificatie is klaar en de landingspagina met wachtlijst is gebouwd. Zie [11 — Roadmap](docs/11-roadmap-en-validatie.md) voor de volgende stappen.
 
 ## In één minuut
 
@@ -54,4 +54,30 @@ Potje is een Nederlandse website die huishoudens elke week een weekmenu en boods
 2. **Open vragen beantwoorden** uit [12 — Risico's en open vragen](docs/12-risicos-en-open-vragen.md).
 3. **Sprint 0** van het MVP: projectbasis, `DESIGN.md`, CI.
 
-Richtlijnen voor wie (mens of AI) code schrijft in deze repository staan in [CLAUDE.md](CLAUDE.md).
+## Lokaal draaien
+
+Je hebt Node.js 22 of nieuwer nodig.
+
+```bash
+npm install
+```
+
+```bash
+npm run dev
+```
+
+Open http://localhost:3000. Zonder sleutels werkt de wachtlijst al: aanmeldingen staan tijdelijk in het geheugen en de bevestigingsmail (met link) verschijnt in de terminal.
+
+Controles: `npm run lint`, `npm run typecheck`, `npm test` (unit) en `npm run test:e2e` (browser).
+
+## Live zetten (fase 0)
+
+1. **Supabase** — maak een gratis project aan in regio *Central EU (Frankfurt)*. Open de SQL-editor en voer `supabase/migrations/20261124000000_waitlist.sql` uit. Noteer de project-URL en de *secret key* (Project Settings → API Keys).
+2. **Brevo** — maak een account, verifieer het afzenderadres (en liefst je domein), en maak een API-sleutel aan.
+3. **Vercel** — importeer deze GitHub-repository. Vul bij *Environment Variables* de waarden uit `.env.example` in: `NEXT_PUBLIC_SITE_URL` (je domein), `NEXT_PUBLIC_OWNER_NAME`, `NEXT_PUBLIC_CONTACT_EMAIL`, `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `BREVO_API_KEY`, `EMAIL_FROM`. Let op: voor commercieel gebruik vraagt Vercel het Pro-plan.
+4. **Plausible** (optioneel) — voeg je domein toe en zet de script-URL in `NEXT_PUBLIC_PLAUSIBLE_SCRIPT_SRC`.
+5. **Controleer** de privacyverklaring op `/privacy`: zolang naam of contactadres ontbreekt, staat daar een gemarkeerd plekje.
+
+Zonder Supabase- en Brevo-sleutels weigert de productieversie aanmeldingen, zodat er nooit stilletjes aanmeldingen verloren gaan.
+
+Richtlijnen voor wie (mens of AI) code schrijft in deze repository staan in [CLAUDE.md](CLAUDE.md). Het ontwerpsysteem staat in [DESIGN.md](DESIGN.md).

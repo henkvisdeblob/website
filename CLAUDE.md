@@ -14,7 +14,7 @@ The full product specification lives in `docs/` (in Dutch). Read the relevant do
 | The meal-plan algorithm (`lib/planner/`) | `docs/05-weekmenu-algoritme.md` |
 | Deals ingestion, matching, recipes, ingredients | `docs/06-data-en-aanbiedingen.md` |
 | Stack, schema, folders, jobs, Stripe, security | `docs/07-technische-architectuur.md` |
-| UI, copy, tone of voice | `docs/08-ontwerp-en-merk.md` (+ `DESIGN.md` once it exists) |
+| UI, copy, tone of voice | `DESIGN.md` (tokens, components) + `docs/08-ontwerp-en-merk.md` (tone) |
 | Subscriptions, cancellation, privacy, consent | `docs/09-juridisch-en-administratie.md` |
 | What to build next | `docs/11-roadmap-en-validatie.md` |
 
@@ -62,13 +62,17 @@ Next.js (App Router, TypeScript, strict) · Tailwind CSS + shadcn/ui · Supabase
 
 ## Commands
 
-The project has not been scaffolded yet (sprint 0 in `docs/11`). Once it is, keep this section current, for example:
-
 ```bash
-npm run dev          # local dev server
+npm run dev          # local dev server (http://localhost:3000)
 npm run lint
-npm run typecheck
-npm test             # Vitest
-npm run test:e2e     # Playwright
-npx supabase start   # local Supabase (Docker)
+npm run typecheck    # generates route types (PageProps/LayoutProps), then tsc
+npm test             # Vitest unit tests (tests/unit)
+npm run test:e2e     # Playwright (tests/e2e), uses the preinstalled Chromium 1.63
+npm run build
 ```
+
+Without Supabase/Brevo env vars the waitlist runs in development with an in-memory store and prints emails to the console. Copy `.env.example` to `.env.local` to use real services.
+
+## Next.js version
+
+This is **Next.js 16 with Cache Components and Partial Prefetching enabled** (see `AGENTS.md`). APIs differ from older versions: read the relevant guide in `node_modules/next/dist/docs/` before writing Next.js code. Notable: `searchParams`/`params` are async and must be read inside a `<Suspense>` boundary; `new Date()` in a Server Component needs `"use cache"` or `await io()`; route types `PageProps<'/route'>` and `LayoutProps<'/'>` are global.

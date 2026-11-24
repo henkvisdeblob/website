@@ -28,7 +28,7 @@ Deze beslissingen zijn niet door onderzoek te beantwoorden. Ze moeten genomen zi
 | 1 | Wordt "Potje" de naam? Is het domein beschikbaar? | Werknaam "Potje"; alternatieven: Weekpotje, Kookpotje, Bordbudget. Controleren in fase 0. |
 | 2 | Hoeveel uur per week kun je hieraan besteden? | 10–15 uur (planning in [11](11-roadmap-en-validatie.md)). |
 | 3 | Hoeveel geld wil je in het eerste jaar uitgeven? | €100–€200 in fase 0, daarna ~€70–€100 per maand vaste kosten. |
-| 4 | Ben je 18 jaar of ouder, en heb je al een KvK-inschrijving? | Bepaalt hoe je je inschrijft en welke betaalprovider kan (zie [09](09-juridisch-en-administratie.md)). |
+| 4 | Ben je 18 jaar of ouder, en heb je al een KvK-inschrijving? | **Beantwoord (24-11-2026):** nog geen KvK. Fase 0 (gratis wachtlijst) gaat zonder KvK. Vóór er betalingen komen (sprint 5) opnieuw beslissen; zie [09](09-juridisch-en-administratie.md). |
 | 5 | Met welke supermarkten beginnen we? | AH, Jumbo, Lidl; daarna Aldi en Plus. |
 | 6 | Prijs: €3,99 per maand / €34,99 per jaar? | Ja, met een test van €4,99 na 3 maanden. |
 | 7 | Doe je het concierge-experiment (3 weken met de hand menu's maken)? | Sterk aanbevolen: het goedkoopste bewijs dat mensen betalen. |

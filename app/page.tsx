@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import {
+  ArrowRight,
   Check,
   ChevronDown,
   Package,
@@ -13,7 +14,7 @@ import {
 } from "lucide-react";
 import { ListPreview, MenuPreview } from "@/components/landing/previews";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
-import { Badge, Container } from "@/components/ui";
+import { Badge, Container, buttonStyles } from "@/components/ui";
 import { WaitlistForm } from "@/components/waitlist-form";
 import { siteConfig } from "@/lib/site-config";
 
@@ -93,7 +94,16 @@ const PLANS = [
 const FAQ: { q: string; a: ReactNode }[] = [
   {
     q: "Wanneer kan ik beginnen?",
-    a: "We bouwen Potje nu. Wie op de wachtlijst staat, krijgt als eerste toegang, in kleine groepjes. We mailen je zodra het jouw beurt is.",
+    a: (
+      <>
+        Je kunt nu al gratis een{" "}
+        <Link href="/weekmenu" className="text-primary underline underline-offset-4">
+          weekmenu maken
+        </Link>{" "}
+        met de aanbiedingen van deze week, zonder account. Accounts, waarmee je elke week automatisch een menu krijgt, bouwen we nu. Wie op de
+        wachtlijst staat, krijgt daar als eerste toegang toe.
+      </>
+    ),
   },
   {
     q: "Welke supermarkten doen mee?",
@@ -136,7 +146,7 @@ export default function HomePage() {
           <Container className="grid items-center gap-12 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
             <div>
               <Badge tone="primary" className="text-sm">
-                Binnenkort · nu op de wachtlijst
+                Nieuw · probeer het gratis
               </Badge>
               <h1 className="mt-5 text-h1 font-bold">Elke week een weekmenu binnen je budget.</h1>
               <p className="mt-5 max-w-prose text-lead text-fg-muted">
@@ -146,6 +156,12 @@ export default function HomePage() {
               <div className="mt-8 max-w-xl">
                 <WaitlistForm location="hero" />
               </div>
+              <p className="mt-6">
+                <Link href="/weekmenu" className={`${buttonStyles.quiet} text-base`}>
+                  Of probeer het nu: maak een weekmenu met de aanbiedingen van deze week
+                  <ArrowRight aria-hidden="true" className="size-4" />
+                </Link>
+              </p>
             </div>
             <div className="mx-auto w-full max-w-md lg:max-w-none">
               <MenuPreview />

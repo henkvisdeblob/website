@@ -1,5 +1,7 @@
 # 05 — Het weekmenu-algoritme
 
+> **Status (november 2026):** versie 1.0.0 is gebouwd in `lib/planner/` en getest (`tests/unit/planner.test.ts`). Hieronder staat het ontwerp; de wegingen in de tabel bij stap 4 zijn de waarden zoals ze in de code staan.
+
 Dit is het hart van het product. Het algoritme is **deterministisch en uitlegbaar**: geen AI per gebruiker, maar rekenregels die we kunnen testen, uitleggen ("waarom staat dit in mijn menu?") en die niets kosten per berekening. AI gebruiken we alleen eenmalig per week voor het koppelen van aanbiedingen aan ingrediënten (zie [06](06-data-en-aanbiedingen.md)).
 
 ## 1. Begrippen
@@ -89,11 +91,14 @@ J(M) = Kosten(M)
 
 | Term | Berekening | Startwaarde (instelbaar) |
 |---|---|---|
-| **Kosten** | Σ over ingrediënten (excl. basisvoorraad): kosten(aantal verpakkingen) | – |
+| **Kosten** | Σ over ingrediënten (excl. basisvoorraad): kosten(aantal verpakkingen) × **0,4** — prijs telt mee, maar het budget is de grens | weging 0,4 |
 | **Verspilling** | Σ over bederfelijke ingrediënten: (overgebleven deel van de laatste verpakking) × prijs van die verpakking × 0,5 | weging 0,5 |
-| **Variatiestraf** | Zelfde hoofdeiwit 2× in de week: €3 per keer · meer dan 2× pasta: €2 per extra keer · zelfde keuken twee avonden achter elkaar: €1 | zie kolom |
-| **Herhalingsstraf** | Recept stond 3–4 weken geleden op het menu: €2 | €2 |
-| **Voorkeursbonus** | Recept beoordeeld met "lekker": €2 · algemene populariteit (gemiddelde beoordeling) 0–€1,50 | zie kolom |
+| **Besparingsbonus** | − 0,5 × de besparing op de verpakkingen die je echt nodig hebt (normale prijs, of onze schatting als de winkel die niet geeft) | weging 0,5 |
+| **Variatiestraf** | Zelfde hoofdeiwit 2× in de week: €3 per keer · meer dan 2× pasta: €2 per extra keer · meer dan 2× dezelfde keuken: €1 per extra keer · meer dan 1× soep met brood: €2 per extra keer | zie kolom |
+| **Balans** (dieet "alles" / "geen varkensvlees") | Meer vegetarische avonden dan de helft van de week: €2,50 per extra avond | €2,50 |
+| **Kinderen** | Met kinderen in huis: €1,50 per recept dat niet als kindvriendelijk is gemarkeerd | €1,50 |
+| **Herhalingsstraf** | Recept stond 2–4 weken geleden op het menu: €2 (binnen 2 weken: uitgesloten) | €2 |
+| **Voorkeursbonus** | Recept beoordeeld met "lekker": €2 · per recept een kleine willekeurige voorkeur uit de seed (0–€1,50), zodat "Ander menu" een ander menu geeft | zie kolom |
 
 **Harde grens (Premium):** `Kosten(M) ≤ budget`. Menu's die daar overheen gaan, tellen niet mee. Als geen enkel menu binnen budget past, kiezen we het menu met de laagste kosten en tonen we de melding uit [04](04-functionele-specificatie.md) (US-4.1, AC6).
 

@@ -1,5 +1,19 @@
 # 11 — Roadmap en validatie
 
+## Status (26 november 2026)
+
+| Onderdeel | Status |
+|---|---|
+| Specificatie (docs 01–12) | ✅ |
+| Landingspagina + wachtlijst (fase 0) | ✅ gebouwd, wacht op Supabase/Brevo-sleutels om live te gaan |
+| Ingrediëntenlijst (±70, incl. basisvoorraad) en 34 recepten | ✅ eerste versie — doel 150 recepten |
+| Aanbiedingen ophalen (PrijsProfeet), normaliseren, koppelen aan ingrediënten (regels) | ✅ live getest op AH, Jumbo, Lidl |
+| Weekmenu-algoritme v1.0.0 + tests | ✅ |
+| `/weekmenu`: gratis weekmenu + boodschappenlijst zonder account | ✅ |
+| Database, accounts, onboarding, wekelijkse mail | ⏳ volgende stap (sprint 3–4) |
+| AI-koppeling (Claude) en beheeromgeving | ⏳ |
+| Betalen (Stripe) | ⏳ pas na KvK-inschrijving |
+
 Uitgangspunt: **één persoon, ~10–15 uur per week.** Bij meer tijd gaat alles sneller; de volgorde blijft gelijk.
 
 ```mermaid

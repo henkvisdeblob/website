@@ -25,6 +25,8 @@ export default defineConfig({
     env: {
       WAITLIST_ALLOW_MEMORY_STORE: "1",
       WAITLIST_RATE_LIMIT: "1000",
+      PLAN_RATE_LIMIT: "1000",
+      DEALS_SOURCE: "sample",
       NEXT_PUBLIC_SITE_URL: `http://localhost:${PORT}`,
     },
   },

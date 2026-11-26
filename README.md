@@ -4,7 +4,7 @@
 
 Potje is een Nederlandse website die huishoudens elke week een weekmenu en boodschappenlijst geeft, gebouwd rond de supermarktaanbiedingen van die week. Het menu blijft binnen je budget, gebruikt restjes slim en laat zien hoeveel je bespaart. Het verdienmodel is freemium met een Premium-abonnement.
 
-> **Status:** fase 0 (validatie). De productspecificatie is klaar en de landingspagina met wachtlijst is gebouwd. Zie [11 — Roadmap](docs/11-roadmap-en-validatie.md) voor de volgende stappen.
+> **Status:** de landingspagina met wachtlijst is klaar, en op **`/weekmenu`** kun je al een echt weekmenu maken uit de aanbiedingen van deze week (AH, Jumbo, Lidl), zonder account. Accounts en de wekelijkse mail volgen. Zie [11 — Roadmap](docs/11-roadmap-en-validatie.md#status-26-november-2026).
 
 ## In één minuut
 
@@ -66,7 +66,10 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:3000. Zonder sleutels werkt de wachtlijst al: aanmeldingen staan tijdelijk in het geheugen en de bevestigingsmail (met link) verschijnt in de terminal.
+Open http://localhost:3000 en http://localhost:3000/weekmenu. Zonder sleutels werkt de wachtlijst al: aanmeldingen staan tijdelijk in het geheugen en de bevestigingsmail (met link) verschijnt in de terminal. De aanbiedingen komen live van PrijsProfeet (geen sleutel nodig).
+
+- Zonder internet of voor tests: zet `DEALS_SOURCE=sample` (verzonnen voorbeeldaanbiedingen).
+- Zit je achter een proxy (zoals in sommige cloud-ontwikkelomgevingen)? Start dan met `NODE_USE_ENV_PROXY=1`, anders kan Node de API niet bereiken.
 
 Controles: `npm run lint`, `npm run typecheck`, `npm test` (unit) en `npm run test:e2e` (browser).
 

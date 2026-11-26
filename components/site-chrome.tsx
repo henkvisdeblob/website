@@ -12,9 +12,14 @@ export function SiteHeader({ cta = true }: { cta?: boolean }) {
           <Logo />
         </Link>
         {cta && (
-          <ButtonLink href="/#wachtlijst" variant="secondarySmall">
-            Op de wachtlijst
-          </ButtonLink>
+          <nav aria-label="Hoofdmenu" className="flex items-center gap-4">
+            <Link href="/weekmenu" className="hidden text-sm font-semibold text-fg underline-offset-4 hover:underline sm:inline">
+              Weekmenu maken
+            </Link>
+            <ButtonLink href="/#wachtlijst" variant="secondarySmall">
+              Op de wachtlijst
+            </ButtonLink>
+          </nav>
         )}
       </Container>
     </header>

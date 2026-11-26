@@ -19,7 +19,17 @@ Geen enkele Nederlandse supermarkt biedt een officiële openbare API voor aanbie
 | **C. Zelf websites of apps van supermarkten uitlezen (scrapen)** | Gratis | Kan in strijd zijn met de gebruiksvoorwaarden van de supermarkten en met het databankenrecht; breekt bij elke wijziging; veel onderhoud | ❌ **Niet doen** |
 | **D. Samenwerking met een supermarkt of folderplatform** | Officiële data, mogelijk inkomsten | Pas haalbaar met bereik | Later onderzoeken |
 
-### PrijsProfeet: wat we weten
+### PrijsProfeet: wat we inmiddels zeker weten (getest november 2026)
+
+- De API werkt zonder sleutel. We gebruiken `GET /api/v1/search?q=*&retailer=…&category=…&promotion_status=active|upcoming` (filter op categorie, max. 100 per pagina, 120 verzoeken/minuut per IP zonder sleutel). Een verzoek duurt ±0,5 s.
+- Ketensleutels: `albert_heijn`, `jumbo`, `lidl` (en `aldi`, `plus`, `dirk` …).
+- Deze week: AH 3.124 aanbiedingen, Jumbo 2.116, Lidl 286. AH en Jumbo geven vrijwel altijd een normale prijs (`original_price`); **Lidl meestal niet** — daar rekenen we de besparing tegen onze referentieprijs en tonen we "(deels geschat)".
+- Velden bevestigd: `original_price`, `multi_buy_quantity` + `multi_buy_price` (totaal voor de bundel), `promotion_type` (`percentage`, `multi_buy`, `one_plus_one`, `volume`, `limited`, `starting`), `unified_category`, `valid_from`/`valid_until`, `loyalty_price` + `loyalty_program`.
+- ⚠️ Bij Aldi is `price` de prijs van de hele bundel; daarom doet Aldi nog niet mee.
+- De websitepagina's van PrijsProfeet (prijzen, voorwaarden) zitten achter een Cloudflare-controle en zijn niet automatisch te lezen. **Lees de voorwaarden zelf in je browser** (prijsprofeet.nl/api) voordat de site live gaat.
+- Gebouwd in deze stap: de site haalt de aanbiedingen live op en bewaart ze een paar uur in de cache van Next.js (`lib/deals/live.ts`). De nachtelijke opslag in een database (sectie 2) volgt zodra Supabase is gekoppeld.
+
+### PrijsProfeet: wat de documentatie zegt
 
 Bron: de openbare documentatie op GitHub ([README](https://github.com/PrijsProfeet/supermarkt-api/blob/main/README.en.md), [OpenAPI-specificatie](https://github.com/PrijsProfeet/supermarkt-api)). De Nederlandstalige voorwaarden en prijzen op prijsprofeet.nl konden we niet openen. **Die moeten vóór de bouw gelezen worden.**
 

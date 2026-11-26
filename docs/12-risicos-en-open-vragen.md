@@ -40,7 +40,7 @@ Deze beslissingen zijn niet door onderzoek te beantwoorden. Ze moeten genomen zi
 
 | Aanname | Hoe controleren | Wanneer |
 |---|---|---|
-| Gebruik van PrijsProfeet-data achter een betaalmuur is toegestaan (met bronvermelding) | Nederlandstalige voorwaarden lezen + mail aan PrijsProfeet | Fase 0 |
+| Gebruik van PrijsProfeet-data achter een betaalmuur is toegestaan (met bronvermelding) | Nederlandstalige voorwaarden lezen in je browser (de pagina is niet automatisch te openen) + mail aan PrijsProfeet | Vóór livegang |
 | Prijzen van PrijsProfeet Pro passen in het budget | Prijzen opvragen | Fase 0 |
 | De dekking van verse producten (vlees, vis, groente) in de aanbiedingsdata is voldoende | Gratis sleutel aanvragen en een week aanbiedingen van AH, Jumbo, Lidl ophalen en bekijken | Fase 0 |
 | Concurrenten doen ons onderscheid niet al | Checklist in [02](02-markt-en-concurrentie.md) | Fase 0 |

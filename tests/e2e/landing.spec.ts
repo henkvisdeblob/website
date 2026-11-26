@@ -62,7 +62,10 @@ test.describe("keyboard", () => {
     await page.keyboard.press("Tab");
     await expect(page.getByRole("link", { name: /naar de homepage/ })).toBeFocused();
     await page.keyboard.press("Tab");
+    await expect(page.getByRole("link", { name: "Weekmenu maken" })).toBeFocused();
+    await page.keyboard.press("Tab");
     await expect(page.getByRole("link", { name: "Op de wachtlijst" })).toBeFocused();
+    // The hero links to the planner below the form, so the email field comes first after the header.
     await page.keyboard.press("Tab");
     const email = page.locator("main section").first().getByLabel("Je e-mailadres");
     await expect(email).toBeFocused();

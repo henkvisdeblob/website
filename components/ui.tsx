@@ -14,6 +14,7 @@ const sizeSm = "h-10 px-4 text-sm";
 export const buttonStyles = {
   primary: `${buttonBase} ${sizeMd} bg-primary text-on-primary hover:bg-primary-hover`,
   secondary: `${buttonBase} ${sizeMd} border border-border-strong bg-surface text-fg hover:bg-muted`,
+  primarySmall: `${buttonBase} ${sizeSm} bg-primary text-on-primary hover:bg-primary-hover`,
   secondarySmall: `${buttonBase} ${sizeSm} border border-border-strong bg-surface text-fg hover:bg-muted`,
   quiet: "inline-flex items-center gap-1 font-semibold text-primary underline-offset-4 hover:underline",
 } as const;

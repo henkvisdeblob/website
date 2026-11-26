@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
-import { WeekPlanner } from "@/components/planner/week-planner";
+import { Suspense } from "react";
+import { TopDeals } from "@/components/deals/top-deals";
+import { EmptyState, WeekPlanner } from "@/components/planner/week-planner";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { Container } from "@/components/ui";
 
@@ -13,7 +15,7 @@ export const metadata: Metadata = {
 export default function WeekmenuPage() {
   return (
     <>
-      <SiteHeader />
+      <SiteHeader current="weekmenu" />
       <main id="inhoud" className="flex-1 py-10 md:py-14">
         <Container>
           <h1 className="text-h2 font-bold">Je weekmenu uit de aanbiedingen van deze week</h1>
@@ -22,7 +24,15 @@ export default function WeekmenuPage() {
             boodschappenlijst.
           </p>
           <div className="mt-8">
-            <WeekPlanner />
+            <WeekPlanner
+              emptyState={
+                <EmptyState>
+                  <Suspense fallback={<p className="text-sm text-fg-subtle">Aanbiedingen laden…</p>}>
+                    <TopDeals compact />
+                  </Suspense>
+                </EmptyState>
+              }
+            />
           </div>
         </Container>
       </main>

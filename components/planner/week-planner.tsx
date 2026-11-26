@@ -1,7 +1,8 @@
 "use client";
 
-import { startTransition, useActionState, useEffect, useMemo, useRef, useState } from "react";
-import { AlertTriangle, ChefHat, Clock, Info, RefreshCw, ShoppingBasket, Tag, Users } from "lucide-react";
+import { startTransition, useActionState, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { AlertTriangle, ChefHat, Clock, Info, Pencil, RefreshCw, ShoppingBasket, Tag, Users } from "lucide-react";
+import { MealIcon } from "@/components/planner/meal-icon";
 import { planWeekAction, type PlanState } from "@/app/actions/plan";
 import { trackEvent } from "@/components/analytics";
 import { Badge, ButtonLink, buttonStyles } from "@/components/ui";
@@ -18,10 +19,13 @@ const initialState: PlanState = { status: "idle" };
 const field = "mt-2 block h-12 w-full rounded-md border border-border-strong bg-surface px-3 text-base text-fg";
 const labelCls = "block text-sm font-semibold text-fg";
 
-export function WeekPlanner() {
+export function WeekPlanner({ emptyState }: { emptyState?: ReactNode }) {
   const [state, formAction, pending] = useActionState(planWeekAction, initialState);
   const formRef = useRef<HTMLFormElement>(null);
   const [variant, setVariant] = useState(0);
+  // On phones the form folds away once there is a menu, so the result comes first.
+  const [editingFor, setEditingFor] = useState<PlanState | null>(null);
+  const collapsed = state.status === "ok" && editingFor !== state;
 
   const [adults, setAdults] = useState(2);
   const [kidsYoung, setKidsYoung] = useState(0);
@@ -67,14 +71,34 @@ export function WeekPlanner() {
   const newVariant = () => submit(variant + 1);
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[22rem_1fr] lg:gap-12">
+    <div className="grid gap-8 lg:grid-cols-[22rem_1fr] lg:gap-12">
+      {state.status === "ok" && collapsed && (
+        <div className="flex items-center justify-between gap-3 rounded-lg border border-border bg-surface px-4 py-3 lg:hidden">
+          <p className="min-w-0 text-sm text-fg-muted">
+            <span className="font-semibold text-fg">{state.storeName}</span> · {state.plan.meals.length} avonden ·{" "}
+            {formatPortions(state.plan.portions)} porties
+            {state.plan.budgetCents !== null && <> · budget {formatEuro(state.plan.budgetCents)}</>}
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              setEditingFor(state);
+              requestAnimationFrame(() => formRef.current?.querySelector<HTMLElement>("input, select")?.focus());
+            }}
+            className={`${buttonStyles.secondarySmall} shrink-0`}
+          >
+            <Pencil aria-hidden="true" className="size-4" />
+            Aanpassen
+          </button>
+        </div>
+      )}
       <form
         ref={formRef}
         onSubmit={(e) => {
           e.preventDefault();
           submit(0);
         }}
-        className="h-fit rounded-xl border border-border bg-surface p-5 sm:p-6 lg:sticky lg:top-6"
+        className={`h-fit rounded-xl border border-border bg-surface p-5 sm:p-6 lg:sticky lg:top-6 ${collapsed ? "max-lg:hidden" : ""}`}
       >
         <input type="hidden" name="variant" value={variant} readOnly />
         <fieldset>
@@ -184,7 +208,7 @@ export function WeekPlanner() {
       </form>
 
       <section aria-live="polite" aria-busy={pending} className="min-w-0">
-        {state.status === "idle" && <EmptyState />}
+        {state.status === "idle" && (emptyState ?? <EmptyState />)}
         {state.status === "error" && (
           <p role="alert" className="flex items-start gap-2 rounded-md bg-error-soft px-4 py-3 font-medium text-error">
             <AlertTriangle aria-hidden="true" className="mt-0.5 size-5 shrink-0" />
@@ -223,14 +247,29 @@ function NumberSelect(props: { label: string; name: string; value: number; onCha
   );
 }
 
-function EmptyState() {
+/** Shown before the first menu: what happens, plus (server-rendered) this week's best deals. */
+export function EmptyState({ children }: { children?: ReactNode }) {
   return (
-    <div className="rounded-xl border border-dashed border-border-strong p-8 text-center">
-      <ShoppingBasket aria-hidden="true" className="mx-auto size-10 text-primary" strokeWidth={1.5} />
-      <p className="mt-4 font-display text-h3 font-bold">Je weekmenu verschijnt hier</p>
-      <p className="mx-auto mt-2 max-w-prose text-fg-muted">
-        Kies je supermarkt en je huishouden. We zoeken de aanbiedingen van deze week erbij en maken een menu met boodschappenlijst.
-      </p>
+    <div>
+      <div className="flex items-start gap-4 rounded-xl bg-muted p-5 sm:p-6">
+        <span aria-hidden="true" className="grid size-11 shrink-0 place-items-center rounded-md bg-surface text-primary">
+          <ShoppingBasket className="size-6" strokeWidth={1.75} />
+        </span>
+        <div>
+          <p className="font-display text-h4 font-bold">Je weekmenu verschijnt hier</p>
+          <p className="mt-1 max-w-prose text-fg-muted">
+            Kies links je supermarkt en je huishouden. We zoeken de aanbiedingen van deze week erbij en maken een menu met
+            boodschappenlijst, binnen je budget.
+          </p>
+        </div>
+      </div>
+      {children && (
+        <div className="mt-8">
+          <h2 className="text-h3 font-bold">Deze week in de aanbieding</h2>
+          <p className="mt-1 text-fg-muted">De beste kook-aanbiedingen per supermarkt. Je menu wordt eromheen gebouwd.</p>
+          <div className="mt-4">{children}</div>
+        </div>
+      )}
     </div>
   );
 }
@@ -249,12 +288,16 @@ function Results({
   pending: boolean;
 }) {
   const headingRef = useRef<HTMLHeadingElement>(null);
-  // Move focus to the new results so keyboard and screen-reader users land on them.
+  const topRef = useRef<HTMLDivElement>(null);
+  // Bring the new results into view and move focus there, for keyboard and screen-reader users too.
   useEffect(() => {
-    headingRef.current?.focus();
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    topRef.current?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    headingRef.current?.focus({ preventScroll: true });
   }, [plan]);
+  const perPortion = plan.meals.length ? Math.round(plan.totalCents / (plan.portions * plan.meals.length)) : 0;
   return (
-    <div>
+    <div ref={topRef} className="scroll-mt-4">
       <div className="rounded-xl border border-border bg-surface p-5 shadow-card sm:p-6">
         <h2 ref={headingRef} tabIndex={-1} className="text-sm font-semibold text-fg-subtle outline-none">
           Weekmenu · {storeName} · boodschappen op {formatDateNl(plan.shopDate)}
@@ -272,10 +315,12 @@ function Results({
               </Badge>
             ))}
         </div>
-        <p className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-fg-muted">
+        {plan.budgetCents !== null && plan.budgetCents > 0 && <BudgetMeter total={plan.totalCents} budget={plan.budgetCents} />}
+        <p className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-fg-muted">
           <span className="inline-flex items-center gap-1">
             <Users aria-hidden="true" className="size-4" /> {formatPortions(plan.portions)} porties per avond
           </span>
+          <span className="tabular-nums">≈ {formatEuro(perPortion)} per portie</span>
           {plan.savingsCents > 0 && (
             <span className="font-semibold text-savings">
               Je bespaart {formatEuro(plan.savingsCents)} met de aanbiedingen
@@ -355,6 +400,7 @@ function MealCard({ meal }: { meal: PlannedMeal }) {
           <span className="block text-sm font-bold uppercase text-fg-subtle">{shortWeekdayNl(meal.date)}</span>
           <span className="block font-display text-h4 font-bold tabular-nums">{Number(meal.date.slice(8))}</span>
         </div>
+        <MealIcon recipe={r} className="hidden size-11 shrink-0 sm:grid" />
         <div className="min-w-0 flex-1">
           <h3 className="text-h4 font-bold leading-snug">{r.title}</h3>
           <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-fg-muted">
@@ -425,6 +471,19 @@ function ShoppingList({ plan }: { plan: PlanResult }) {
           {checked.size} van {plan.purchases.length} in je mandje
         </p>
       </div>
+      <div
+        role="progressbar"
+        aria-label="Boodschappen in je mandje"
+        aria-valuemin={0}
+        aria-valuemax={plan.purchases.length}
+        aria-valuenow={checked.size}
+        className="mt-3 h-1.5 overflow-hidden rounded-full bg-muted"
+      >
+        <div
+          className="h-full rounded-full bg-savings transition-[width] duration-300"
+          style={{ width: `${plan.purchases.length ? (checked.size / plan.purchases.length) * 100 : 0}%` }}
+        />
+      </div>
       <div className="mt-4 rounded-lg border border-border bg-surface px-4 py-2 sm:px-5">
         {groups.map((g) => (
           <div key={g.aisle} className="py-3">
@@ -471,6 +530,30 @@ function ListItem({ purchase: p, checked, onToggle }: { purchase: Purchase; chec
         </span>
       </label>
     </li>
+  );
+}
+
+function BudgetMeter({ total, budget }: { total: number; budget: number }) {
+  const ratio = Math.min(1, total / budget);
+  const over = total > budget;
+  const left = budget - total;
+  return (
+    <div className="mt-4">
+      <div
+        role="meter"
+        aria-label="Deel van je budget"
+        aria-valuemin={0}
+        aria-valuemax={budget / 100}
+        aria-valuenow={total / 100}
+        aria-valuetext={`${formatEuro(total)} van ${formatEuro(budget)}`}
+        className="h-2 overflow-hidden rounded-full bg-muted"
+      >
+        <div className={`h-full rounded-full ${over ? "bg-warning" : "bg-savings"}`} style={{ width: `${ratio * 100}%` }} />
+      </div>
+      <p className="mt-1.5 text-caption text-fg-subtle tabular-nums">
+        {over ? `${formatEuro(-left)} boven je budget` : `Nog ${formatEuro(left)} over van je budget`}
+      </p>
+    </div>
   );
 }
 

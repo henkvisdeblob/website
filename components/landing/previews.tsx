@@ -1,4 +1,4 @@
-import { Check, Clock, Tag } from "lucide-react";
+import { Check, Clock, PiggyBank, Tag } from "lucide-react";
 import { Badge } from "@/components/ui";
 import { formatEuro } from "@/lib/format";
 
@@ -67,6 +67,23 @@ export function MenuPreview() {
         Voorbeeld van een weekmenu · bedragen ter illustratie
       </figcaption>
     </figure>
+  );
+}
+
+/** Hero visual: the week menu with a savings note and a slice of the shopping list floating around it. */
+export function HeroVisual() {
+  return (
+    <div className="relative">
+      <div aria-hidden="true" className="absolute -inset-6 -z-10 rounded-xl bg-primary-soft/60 blur-2xl lg:-inset-10" />
+      <MenuPreview />
+      <div
+        aria-hidden="true"
+        className="absolute -right-3 -top-5 hidden items-center gap-2 rounded-full border border-border bg-surface px-4 py-2 text-sm font-semibold text-savings shadow-card sm:flex lg:-right-8"
+      >
+        <PiggyBank className="size-4" strokeWidth={2} />
+        Je bespaart {formatEuro(EXAMPLE_SAVINGS_CENTS)}
+      </div>
+    </div>
   );
 }
 

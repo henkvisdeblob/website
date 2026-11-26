@@ -75,17 +75,24 @@ Line length: paragraphs max `max-w-prose` (~65 characters).
 - **Button — primary:** `bg-primary text-on-primary`, `rounded-md`, height 48px (`h-12`), `px-5`, `font-semibold`. Hover `bg-primary-hover`. Disabled: 50% opacity, no pointer. One primary button per view.
 - **Button — secondary:** `bg-surface text-fg border border-border-strong`, hover `bg-muted`.
 - **Button — quiet:** text only, `text-primary underline-offset-4 hover:underline`.
+- **Button — small (`primarySmall`, `secondarySmall`):** height 40px (`h-10`), `px-4`, `text-sm`. Only in the header.
 - **Focus (all interactive elements):** `outline-2 outline-offset-2 outline-primary` on `:focus-visible`. Never remove focus styles.
 - **Link (in text):** `text-primary underline underline-offset-4 decoration-1 hover:decoration-2`.
 - **Input:** height 48px, `bg-surface`, `border border-border-strong`, `rounded-md`, `px-4`, `text-base` (16px prevents iOS zoom). Label always visible above the field. Error: `border-error` + message with icon below, linked via `aria-describedby`.
 - **Card:** `bg-surface border border-border rounded-lg p-6`.
-- **Badge:** `text-caption font-semibold rounded-sm px-2 py-0.5`; variants `savings` (savings-soft), `warning` (warning-soft), `neutral` (muted).
-- **Navigation:** slim top bar: wordmark left, one call to action right. No hamburger on the landing page.
+- **Badge:** `text-caption font-semibold rounded-sm px-2 py-0.5`; variants `savings` (savings-soft), `warning` (warning-soft), `neutral` (muted), `primary` (primary-soft). Deal labels ("1+1 gratis", "−50%") are always `savings` with a `Tag` icon.
+- **Budget meter:** `role="meter"` with `aria-valuenow/min/max`; 8px track in `bg-muted`, fill `bg-savings` within budget and `bg-error` over budget, amount in text next to it (never color alone).
+- **Progress bar (shopping list):** `role="progressbar"`, same track as the meter, fill `bg-savings`, with "x van y in je mandje" as text.
+- **Meal icon:** 40px tile `rounded-md bg-primary-soft text-on-primary-soft` with a Lucide icon chosen from the recipe's main protein (soup recipes get a bowl). Decorative: `aria-hidden`.
+- **Deal list (`components/deals/top-deals.tsx`):** one card per store, rows with product name (truncated, full name in `title`), price, struck-through normal price and a savings badge. Always followed by the date and "Aanbiedingen via PrijsProfeet", or by the test-mode notice for sample data.
+- **Feature tiles (bento):** cards in a 6-column grid (`md:col-span-3` / `md:col-span-2`), icon tile + title + one sentence, ending in a small piece of real-looking UI on `bg-muted`. Not a row of identical icon cards.
+- **Navigation:** slim top bar: wordmark left, at most one text link and one small button right. On the planner the button points to the waitlist instead of the planner. No hamburger.
 - **Footer:** `bg-muted`, small print in `fg-subtle`: independence disclaimer, privacy link, data source.
 
 ## Imagery and icons
 
 - **Icons:** Lucide (`lucide-react`), stroke 1.75, 20px inline / 24px in feature lists, color `fg-muted` or `primary`. No emoji as icons.
-- **Product visuals:** real UI rendered in HTML (week menu, shopping list), labeled "voorbeeld" when numbers are illustrative.
+- **Product visuals:** real UI rendered in HTML (week menu, shopping list), labeled "voorbeeld" when numbers are illustrative. The hero shows the week menu on a soft `primary-soft` glow with one floating savings pill; nothing may cover the menu's content.
+- **Social preview:** `app/opengraph-image.tsx` renders the 1200×630 image with the light-mode colors and Bricolage 800 (`app/fonts/*.woff`, OFL).
 - **Photos:** none until we have our own food photography (daylight, top-down). No stock photos of smiling families.
 - **Logo:** wordmark "Potje" in Display 800 with a cooking-pot mark in a `primary` rounded square.

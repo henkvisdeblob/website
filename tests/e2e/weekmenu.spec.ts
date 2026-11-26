@@ -43,9 +43,9 @@ test.describe("weekmenu planner", () => {
     await expect(page.getByText(/^1 van \d+ in je mandje$/)).toBeVisible();
   });
 
-  test("'Ander menu' makes a new menu and keeps the visitor's choices", async ({ page }) => {
+  test("'Ander menu' makes a new menu and keeps the visitor's choices", async ({ page, isMobile }) => {
     await page.goto("/weekmenu");
-    await page.getByText("Lidl", { exact: true }).click();
+    await page.getByRole("group", { name: "Supermarkt" }).getByText("Lidl", { exact: true }).click();
     await page.getByLabel("Dieet").selectOption("vegetarian");
     await page.getByRole("button", { name: "Maak mijn weekmenu" }).click();
     await expect(page.getByRole("heading", { name: "Wat eten we?" })).toBeVisible();
@@ -54,6 +54,11 @@ test.describe("weekmenu planner", () => {
       await expect(page.locator("input[name=variant]")).toHaveValue(expected);
     }
     await expect(page.getByText(/Weekmenu · Lidl/)).toBeVisible();
+    // On phones the form folds away behind a summary once there is a menu.
+    if (isMobile) {
+      await expect(page.getByRole("radio", { name: "Lidl" })).toBeHidden();
+      await page.getByRole("button", { name: "Aanpassen" }).click();
+    }
     await expect(page.getByLabel("Dieet")).toHaveValue("vegetarian");
     await expect(page.getByRole("radio", { name: "Lidl" })).toBeChecked();
   });
@@ -68,7 +73,7 @@ test.describe("weekmenu planner", () => {
 
   test("the landing page links to the planner", async ({ page }) => {
     await page.goto("/");
-    await page.getByRole("link", { name: /maak een weekmenu met de aanbiedingen/ }).click();
+    await page.locator("main section").first().getByRole("link", { name: "Maak gratis je weekmenu" }).click();
     await expect(page).toHaveURL(/\/weekmenu$/);
   });
 });

@@ -4,21 +4,29 @@ import { Logo } from "@/components/logo";
 import { Container, ButtonLink } from "@/components/ui";
 import { siteConfig } from "@/lib/site-config";
 
-export function SiteHeader({ cta = true }: { cta?: boolean }) {
+export function SiteHeader({ cta = true, current }: { cta?: boolean; current?: "weekmenu" }) {
   return (
     <header className="border-b border-border/70">
-      <Container className="flex h-16 items-center justify-between">
+      <Container className="flex h-16 items-center justify-between gap-4">
         <Link href="/" aria-label={`${siteConfig.name}, naar de homepage`} className="rounded-md">
           <Logo />
         </Link>
         {cta && (
-          <nav aria-label="Hoofdmenu" className="flex items-center gap-4">
-            <Link href="/weekmenu" className="hidden text-sm font-semibold text-fg underline-offset-4 hover:underline sm:inline">
-              Weekmenu maken
-            </Link>
-            <ButtonLink href="/#wachtlijst" variant="secondarySmall">
-              Op de wachtlijst
-            </ButtonLink>
+          <nav aria-label="Hoofdmenu" className="flex items-center gap-3 sm:gap-5">
+            {current === "weekmenu" ? (
+              <ButtonLink href="/#wachtlijst" variant="secondarySmall">
+                Op de wachtlijst
+              </ButtonLink>
+            ) : (
+              <>
+                <Link href="/#wachtlijst" className="hidden text-sm font-semibold text-fg underline-offset-4 hover:underline sm:inline">
+                  Wachtlijst
+                </Link>
+                <ButtonLink href="/weekmenu" variant="primarySmall">
+                  Weekmenu maken
+                </ButtonLink>
+              </>
+            )}
           </nav>
         )}
       </Container>
@@ -38,6 +46,12 @@ export function SiteFooter() {
           </p>
         </div>
         <nav aria-label="Footer" className="flex flex-col gap-2 md:items-end">
+          <Link href="/weekmenu" className="underline-offset-4 hover:text-fg hover:underline">
+            Weekmenu maken
+          </Link>
+          <Link href="/#wachtlijst" className="underline-offset-4 hover:text-fg hover:underline">
+            Wachtlijst
+          </Link>
           <Link href="/privacy" className="underline-offset-4 hover:text-fg hover:underline">
             Privacyverklaring
           </Link>

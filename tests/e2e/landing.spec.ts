@@ -5,8 +5,19 @@ test.describe("landing page", () => {
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Elke week een weekmenu binnen je budget.");
     const hero = page.locator("main section").first();
-    await expect(hero.getByRole("button", { name: "Zet me op de wachtlijst" })).toBeVisible();
+    const cta = hero.getByRole("link", { name: "Maak gratis je weekmenu" });
+    await expect(cta).toBeVisible();
+    await expect(cta).toBeInViewport();
     await expect(hero.getByText("Voorbeeld van een weekmenu")).toBeVisible();
+  });
+
+  test("shows this week's deals per store", async ({ page }) => {
+    await page.goto("/");
+    const deals = page.getByRole("region", { name: "Deze week in de aanbieding" });
+    await expect(deals.getByText("Albert Heijn", { exact: true })).toBeVisible();
+    await expect(deals.getByText(/toppers$/).first()).toBeVisible();
+    // The e2e server runs with DEALS_SOURCE=sample, which must be labelled as made-up data.
+    await expect(deals.getByText("Testmodus: verzonnen voorbeeldaanbiedingen.")).toBeVisible();
   });
 
   test("has no horizontal scrolling", async ({ page }) => {
@@ -16,25 +27,25 @@ test.describe("landing page", () => {
   });
 
   test("shows a Dutch error for an invalid email address", async ({ page }) => {
-    await page.goto("/");
-    const hero = page.locator("main section").first();
-    await hero.getByLabel("Je e-mailadres").fill("sanne@");
-    await hero.getByRole("button", { name: "Zet me op de wachtlijst" }).click();
-    await expect(hero.getByRole("alert")).toContainText("geldig e-mailadres");
-    await expect(hero.getByLabel("Je e-mailadres")).toHaveAttribute("aria-invalid", "true");
+    await page.goto("/#wachtlijst");
+    const section = page.locator("#wachtlijst");
+    await section.getByLabel("Je e-mailadres").fill("sanne@");
+    await section.getByRole("button", { name: "Zet me op de wachtlijst" }).click();
+    await expect(section.getByRole("alert")).toContainText("geldig e-mailadres");
+    await expect(section.getByLabel("Je e-mailadres")).toHaveAttribute("aria-invalid", "true");
   });
 
   test("signs up and asks to check the inbox", async ({ page }) => {
-    await page.goto("/");
-    const hero = page.locator("main section").first();
+    await page.goto("/#wachtlijst");
+    const section = page.locator("#wachtlijst");
     const email = `test-${Date.now()}-${Math.random().toString(36).slice(2, 7)}@voorbeeld.nl`;
-    await hero.getByLabel("Je e-mailadres").fill(email);
-    await hero.getByRole("button", { name: "Zet me op de wachtlijst" }).click();
-    await expect(hero.getByRole("status")).toContainText("Check je mail");
-    await expect(hero.getByRole("status")).toContainText(email);
+    await section.getByLabel("Je e-mailadres").fill(email);
+    await section.getByRole("button", { name: "Zet me op de wachtlijst" }).click();
+    await expect(section.getByRole("status")).toContainText("Check je mail");
+    await expect(section.getByRole("status")).toContainText(email);
   });
 
-  test("the full form at the bottom accepts the optional questions", async ({ page }) => {
+  test("the waitlist form accepts the optional questions", async ({ page }) => {
     await page.goto("/#wachtlijst");
     const section = page.locator("#wachtlijst");
     await section.getByLabel("Je e-mailadres").fill(`slot-${Date.now()}@voorbeeld.nl`);
@@ -42,6 +53,13 @@ test.describe("landing page", () => {
     await section.getByLabel(/Voor hoeveel mensen kook je/).selectOption("4");
     await section.getByRole("button", { name: "Zet me op de wachtlijst" }).click();
     await expect(section.getByRole("status")).toContainText("Check je mail");
+  });
+
+  test("the hero links to the waitlist", async ({ page }) => {
+    await page.goto("/");
+    await page.locator("main section").first().getByRole("link", { name: "Zet je op de wachtlijst" }).click();
+    await expect(page).toHaveURL(/#wachtlijst$/);
+    await expect(page.locator("#wachtlijst").getByLabel("Je e-mailadres")).toBeInViewport();
   });
 
   test("FAQ answers open and close", async ({ page }) => {
@@ -55,23 +73,35 @@ test.describe("landing page", () => {
 test.describe("keyboard", () => {
   test.skip(({ isMobile }) => isMobile, "keyboard navigation is checked on desktop");
 
-  test("skip link, header and form are reachable and usable with the keyboard", async ({ page }) => {
+  test("skip link, header and hero are reachable in a logical order", async ({ page }) => {
     await page.goto("/");
     await page.keyboard.press("Tab");
     await expect(page.getByRole("link", { name: "Naar de inhoud" })).toBeFocused();
     await page.keyboard.press("Tab");
     await expect(page.getByRole("link", { name: /naar de homepage/ })).toBeFocused();
     await page.keyboard.press("Tab");
-    await expect(page.getByRole("link", { name: "Weekmenu maken" })).toBeFocused();
+    await expect(page.getByRole("banner").getByRole("link", { name: "Wachtlijst" })).toBeFocused();
     await page.keyboard.press("Tab");
-    await expect(page.getByRole("link", { name: "Op de wachtlijst" })).toBeFocused();
-    // The hero links to the planner below the form, so the email field comes first after the header.
+    await expect(page.getByRole("banner").getByRole("link", { name: "Weekmenu maken" })).toBeFocused();
     await page.keyboard.press("Tab");
-    const email = page.locator("main section").first().getByLabel("Je e-mailadres");
-    await expect(email).toBeFocused();
+    await expect(page.getByRole("link", { name: "Maak gratis je weekmenu" })).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(page.getByRole("link", { name: "Zet je op de wachtlijst" })).toBeFocused();
+  });
+
+  test("the waitlist can be reached and submitted with the keyboard", async ({ page }) => {
+    await page.goto("/");
+    const heroLink = page.getByRole("link", { name: "Zet je op de wachtlijst" });
+    await heroLink.focus();
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(/#wachtlijst$/);
+    // Following an in-page link moves the focus starting point, so the next Tab lands in the form.
+    await page.keyboard.press("Tab");
+    const section = page.locator("#wachtlijst");
+    await expect(section.getByLabel("Je e-mailadres")).toBeFocused();
     await page.keyboard.type(`toetsenbord-${Date.now()}@voorbeeld.nl`);
     await page.keyboard.press("Enter");
-    await expect(page.locator("main section").first().getByRole("status")).toContainText("Check je mail");
+    await expect(section.getByRole("status")).toContainText("Check je mail");
   });
 
   test("focus is visible on interactive elements", async ({ page }) => {

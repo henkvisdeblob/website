@@ -11,6 +11,9 @@ export const siteConfig = {
   /** Shown in the privacy statement and footer. Leave unset until decided; pages show a placeholder. */
   ownerName: process.env.NEXT_PUBLIC_OWNER_NAME ?? null,
   contactEmail: process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? null,
+  /** Required before selling Premium (docs/09): who the seller is. A correspondence address is fine. */
+  ownerAddress: process.env.NEXT_PUBLIC_OWNER_ADDRESS ?? null,
+  kvkNumber: process.env.NEXT_PUBLIC_KVK_NUMBER ?? null,
   /** Places you move up on the waitlist for every friend who confirms. */
   referralBoost: 10,
 } as const;

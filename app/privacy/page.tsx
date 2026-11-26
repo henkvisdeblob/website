@@ -1,16 +1,13 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { SimplePage } from "@/components/site-chrome";
+import { Missing } from "@/components/ui";
 import { siteConfig } from "@/lib/site-config";
 
 export const metadata: Metadata = {
   title: "Privacyverklaring",
   description: `Hoe ${siteConfig.name} omgaat met de gegevens die je achterlaat op de wachtlijst.`,
 };
-
-function Missing({ children }: { children: ReactNode }) {
-  return <mark className="rounded-sm bg-warning-soft px-1 text-warning">{children}</mark>;
-}
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (

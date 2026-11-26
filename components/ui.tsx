@@ -50,3 +50,8 @@ export function Badge({
     </span>
   );
 }
+
+/** Marks details that still have to be filled in (owner name, address, KvK number …). */
+export function Missing({ children }: { children: ReactNode }) {
+  return <mark className="rounded-sm bg-warning-soft px-1 text-warning">{children}</mark>;
+}

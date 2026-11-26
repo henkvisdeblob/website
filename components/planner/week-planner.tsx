@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { startTransition, useActionState, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { AlertTriangle, ChefHat, Clock, Info, Pencil, RefreshCw, ShoppingBasket, Tag, Users } from "lucide-react";
 import { MealIcon } from "@/components/planner/meal-icon";
@@ -19,7 +20,8 @@ const initialState: PlanState = { status: "idle" };
 const field = "mt-2 block h-12 w-full rounded-md border border-border-strong bg-surface px-3 text-base text-fg";
 const labelCls = "block text-sm font-semibold text-fg";
 
-export function WeekPlanner({ emptyState }: { emptyState?: ReactNode }) {
+/** `freeDinnerLimit` is set while Premium can be bought: more dinners are marked as Premium (the server checks). */
+export function WeekPlanner({ emptyState, freeDinnerLimit = null }: { emptyState?: ReactNode; freeDinnerLimit?: number | null }) {
   const [state, formAction, pending] = useActionState(planWeekAction, initialState);
   const formRef = useRef<HTMLFormElement>(null);
   const [variant, setVariant] = useState(0);
@@ -30,7 +32,7 @@ export function WeekPlanner({ emptyState }: { emptyState?: ReactNode }) {
   const [adults, setAdults] = useState(2);
   const [kidsYoung, setKidsYoung] = useState(0);
   const [kidsOld, setKidsOld] = useState(0);
-  const [dinners, setDinners] = useState(5);
+  const [dinners, setDinners] = useState(freeDinnerLimit === null ? 5 : Math.min(5, freeDinnerLimit));
   const [budgetTouched, setBudgetTouched] = useState(false);
   const [budget, setBudget] = useState("");
   const [dayLabels, setDayLabels] = useState<string[]>(["Vandaag", "Morgen", "Over 2 dagen", "Over 3 dagen", "Over 4 dagen", "Over 5 dagen", "Over 6 dagen"]);
@@ -123,7 +125,7 @@ export function WeekPlanner({ emptyState }: { emptyState?: ReactNode }) {
         </div>
 
         <div className="mt-5 grid grid-cols-2 gap-3">
-          <NumberSelect label="Avonden" name="dinners" value={dinners} onChange={setDinners} min={3} max={7} />
+          <NumberSelect label="Avonden" name="dinners" value={dinners} onChange={setDinners} min={3} max={7} premiumAbove={freeDinnerLimit} />
           <div>
             <label htmlFor="budgetEuro" className={labelCls}>
               Budget (€)
@@ -209,12 +211,24 @@ export function WeekPlanner({ emptyState }: { emptyState?: ReactNode }) {
 
       <section aria-live="polite" aria-busy={pending} className="min-w-0">
         {state.status === "idle" && (emptyState ?? <EmptyState />)}
-        {state.status === "error" && (
-          <p role="alert" className="flex items-start gap-2 rounded-md bg-error-soft px-4 py-3 font-medium text-error">
-            <AlertTriangle aria-hidden="true" className="mt-0.5 size-5 shrink-0" />
-            {state.message}
-          </p>
-        )}
+        {state.status === "error" &&
+          (state.upgrade ? (
+            // A plan limit, not an error: calm and informative, no red.
+            <p role="alert" className="flex items-start gap-2 rounded-md bg-primary-soft px-4 py-3 text-on-primary-soft">
+              <Info aria-hidden="true" className="mt-0.5 size-5 shrink-0" />
+              <span>
+                {state.message}{" "}
+                <Link href="/account/abonnement" className="font-semibold underline underline-offset-4">
+                  Premium bekijken
+                </Link>
+              </span>
+            </p>
+          ) : (
+            <p role="alert" className="flex items-start gap-2 rounded-md bg-error-soft px-4 py-3 font-medium text-error">
+              <AlertTriangle aria-hidden="true" className="mt-0.5 size-5 shrink-0" />
+              {state.message}
+            </p>
+          ))}
         {state.status === "ok" && (
           <Results
             plan={state.plan}
@@ -229,7 +243,15 @@ export function WeekPlanner({ emptyState }: { emptyState?: ReactNode }) {
   );
 }
 
-function NumberSelect(props: { label: string; name: string; value: number; onChange: (n: number) => void; min: number; max: number }) {
+function NumberSelect(props: {
+  label: string;
+  name: string;
+  value: number;
+  onChange: (n: number) => void;
+  min: number;
+  max: number;
+  premiumAbove?: number | null;
+}) {
   const id = `f-${props.name}`;
   return (
     <div>
@@ -239,7 +261,7 @@ function NumberSelect(props: { label: string; name: string; value: number; onCha
       <select id={id} name={props.name} value={props.value} onChange={(e) => props.onChange(Number(e.target.value))} className={field}>
         {Array.from({ length: props.max - props.min + 1 }, (_, i) => props.min + i).map((n) => (
           <option key={n} value={n}>
-            {n}
+            {props.premiumAbove != null && n > props.premiumAbove ? `${n} (Premium)` : n}
           </option>
         ))}
       </select>

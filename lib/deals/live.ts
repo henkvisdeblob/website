@@ -10,7 +10,8 @@ import { sampleDeals } from "./sample";
 import { topDeals, type TopDeal } from "./top";
 import type { NormalizedDeal } from "./types";
 
-export type DealsResult = { source: "prijsprofeet" | "sample"; deals: NormalizedDeal[] };
+/** `failed`: PrijsProfeet could not be reached; `deals` is empty and the result is cached only briefly. */
+export type DealsResult = { source: "prijsprofeet" | "sample"; deals: NormalizedDeal[]; failed?: boolean };
 
 export type StoreTopDeals = { storeId: StoreId; storeName: string; deals: TopDeal[] };
 export type TopDealsResult = { date: IsoDate; source: "prijsprofeet" | "sample"; stores: StoreTopDeals[] };
@@ -42,12 +43,22 @@ export async function getTopCookingDeals(limit = 5): Promise<TopDealsResult> {
 /**
  * This week's deals for one store. Cached for hours: PrijsProfeet refreshes nightly, and we don't
  * want to call them for every visitor. Set DEALS_SOURCE=sample for tests and offline development.
+ * Never throws: an error inside a cached function would fail the prerender (and so a deploy) even when
+ * the caller catches it. A failure returns no deals and is cached for minutes only.
  */
 export async function getStoreDeals(storeId: StoreId, today: IsoDate): Promise<DealsResult> {
   "use cache";
-  cacheLife("hours");
   if (process.env.DEALS_SOURCE === "sample") {
+    cacheLife("hours");
     return { source: "sample", deals: sampleDeals(storeId, today) };
   }
-  return { source: "prijsprofeet", deals: await new PrijsProfeetSource().fetchDeals(storeId) };
+  try {
+    const deals = await new PrijsProfeetSource().fetchDeals(storeId);
+    cacheLife("hours");
+    return { source: "prijsprofeet", deals };
+  } catch (error) {
+    console.error(`[deals] PrijsProfeet unreachable for ${storeId}`, error);
+    cacheLife("minutes");
+    return { source: "prijsprofeet", deals: [], failed: true };
+  }
 }

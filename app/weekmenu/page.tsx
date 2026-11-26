@@ -4,6 +4,8 @@ import { TopDeals } from "@/components/deals/top-deals";
 import { EmptyState, WeekPlanner } from "@/components/planner/week-planner";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { Container } from "@/components/ui";
+import { FREE_DINNER_LIMIT } from "@/lib/billing/limits";
+import { billingEnabled } from "@/lib/billing/stripe";
 
 export const metadata: Metadata = {
   title: "Weekmenu uit de aanbiedingen van deze week",
@@ -25,6 +27,7 @@ export default function WeekmenuPage() {
           </p>
           <div className="mt-8">
             <WeekPlanner
+              freeDinnerLimit={billingEnabled() ? FREE_DINNER_LIMIT : null}
               emptyState={
                 <EmptyState>
                   <Suspense fallback={<p className="text-sm text-fg-subtle">Aanbiedingen laden…</p>}>

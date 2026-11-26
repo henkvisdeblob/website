@@ -10,9 +10,12 @@
 | Aanbiedingen ophalen (PrijsProfeet), normaliseren, koppelen aan ingrediënten (regels) | ✅ live getest op AH, Jumbo, Lidl |
 | Weekmenu-algoritme v1.0.0 + tests | ✅ |
 | `/weekmenu`: gratis weekmenu + boodschappenlijst zonder account | ✅ |
-| Database, accounts, onboarding, wekelijkse mail | ⏳ volgende stap (sprint 3–4) |
+| Accounts (inloggen met een link in je mail, 14 dagen Premium gratis), account verwijderen | ✅ gebouwd, staat aan zodra de Supabase-sleutels er zijn |
+| Premium via Stripe: afsluiten, opzeggen in 2 klikken, herroepen binnen 14 dagen, webhook, Gratis-grens van 3 avonden | ✅ gebouwd en getest in testmodus; echte betalingen pas na KvK-inschrijving |
+| Voorwaarden (`/voorwaarden`) | ✅ concept — laten nakijken door een jurist |
+| Onboarding, opgeslagen voorkeuren, wekelijkse mail | ⏳ volgende stap — Premium biedt nu nog weinig extra's |
+| Terugbetaling van het niet-gebruikte deel bij opzeggen van een jaarabonnement na het eerste jaar | ⏳ vóór de eerste jaarverlenging (tot die tijd handmatig in Stripe) |
 | AI-koppeling (Claude) en beheeromgeving | ⏳ |
-| Betalen (Stripe) | ⏳ pas na KvK-inschrijving |
 
 Uitgangspunt: **één persoon, ~10–15 uur per week.** Bij meer tijd gaat alles sneller; de volgorde blijft gelijk.
 

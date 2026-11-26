@@ -86,6 +86,8 @@ Line length: paragraphs max `max-w-prose` (~65 characters).
 - **Meal icon:** 40px tile `rounded-md bg-primary-soft text-on-primary-soft` with a Lucide icon chosen from the recipe's main protein (soup recipes get a bowl). Decorative: `aria-hidden`.
 - **Deal list (`components/deals/top-deals.tsx`):** one card per store, rows with product name (truncated, full name in `title`), price, struck-through normal price and a savings badge. Always followed by the date and "Aanbiedingen via PrijsProfeet", or by the test-mode notice for sample data.
 - **Feature tiles (bento):** cards in a 6-column grid (`md:col-span-3` / `md:col-span-2`), icon tile + title + one sentence, ending in a small piece of real-looking UI on `bg-muted`. Not a row of identical icon cards.
+- **Confirm step (`components/account/confirm-action.tsx`):** for actions with consequences (opzeggen, herroepen, account verwijderen): the first click opens a small panel with a plain explanation, "Ja, …" and "Nee, terug"; focus moves to the panel. Two clicks in total. Neutral wording, no guilt-tripping, no red.
+- **Plan limit message:** a free-plan limit is information, not an error: `bg-primary-soft text-on-primary-soft` with an `Info` icon and a link "Premium bekijken". Red (`error`) is only for things that went wrong.
 - **Navigation:** slim top bar: wordmark left, at most one text link and one small button right. On the planner the button points to the waitlist instead of the planner. No hamburger.
 - **Footer:** `bg-muted`, small print in `fg-subtle`: independence disclaimer, privacy link, data source.
 

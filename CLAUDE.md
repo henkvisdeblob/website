@@ -27,7 +27,10 @@ The full product specification lives in `docs/` (in Dutch). Read the relevant do
 | `lib/matching/` | Rule-based deal → ingredient matching |
 | `lib/planner/` | The week-menu algorithm (pure) — `planWeek(input, ctx)` |
 | `lib/waitlist/`, `lib/email/` | Waitlist (double opt-in) and email |
-| `app/actions/` | Server actions (`plan.ts`, `waitlist.ts`) |
+| `lib/auth/`, `proxy.ts` | Accounts: Supabase magic links (`getSessionUser`, `safeNextPath`); proxy refreshes the session and guards `/account` |
+| `lib/billing/` | Premium: `entitlements.ts` (the one `isPremium`, withdrawal window — pure), `webhook.ts` (idempotent Stripe events), `withdraw.ts`, `checkout.ts`, `store.ts` (Supabase), `limits.ts`. Off unless Supabase + Stripe env vars are set |
+| `app/actions/` | Server actions (`plan.ts`, `waitlist.ts`, `auth.ts`, `billing.ts`) |
+| `app/account/abonnement/`, `app/inloggen/`, `app/auth/confirm/`, `app/api/stripe/webhook/` | Account page (subscription, cancel, withdraw, delete), login, login-link landing, Stripe webhook |
 | `app/weekmenu/`, `components/planner/` | The planner page |
 | `scripts/` | Dev tools: `match-report.ts` (how deals match), `plan-preview.ts` (plan from a deal dump), `check-deals.ts` (live source + key check, `npm run check:deals`). Run with `npx tsx`. Never commit deal dumps. |
 

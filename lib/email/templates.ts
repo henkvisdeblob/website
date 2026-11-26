@@ -63,3 +63,88 @@ Bekijk je plek: ${statusUrl}
 Uitschrijven en gegevens verwijderen: ${leaveUrl}`;
   return { to, subject: `Je staat al op de wachtlijst van ${siteConfig.name}`, html, text };
 }
+
+/* ------------------------------------------------------------------------------------------ */
+/* Premium subscription (docs/04 E8). Amounts and dates arrive formatted.                      */
+/* ------------------------------------------------------------------------------------------ */
+
+function billingEmail(params: {
+  to: string;
+  subject: string;
+  preheader: string;
+  paragraphs: string[];
+  action?: { url: string; label: string };
+}): Email {
+  const { to, subject, preheader, paragraphs, action } = params;
+  const html = layout({
+    preheader,
+    bodyHtml:
+      paragraphs.map((p) => `<p style="margin:0 0 16px 0;">${escapeHtml(p)}</p>`).join("") +
+      (action ? `<p style="margin:8px 0 0 0;">${button(action.url, action.label)}</p>` : ""),
+    footerHtml: `Je krijgt deze mail omdat ${escapeHtml(to)} een account heeft bij ${escapeHtml(siteConfig.name)}. Dit is een mail over je abonnement; die sturen we ook als je de wekelijkse mail hebt uitgezet.`,
+  });
+  const text = [...paragraphs, ...(action ? [`${action.label}: ${action.url}`] : [])].join("\n\n");
+  return { to, subject, html, text };
+}
+
+export function premiumStartedEmail(params: {
+  to: string;
+  interval: "month" | "year";
+  manageUrl: string;
+  termsUrl: string;
+}): Email {
+  const period = params.interval === "month" ? "elke maand" : "elk jaar";
+  return billingEmail({
+    to: params.to,
+    subject: `Je Premium-abonnement bij ${siteConfig.name} is gestart`,
+    preheader: "Bedankt! Je Premium staat aan.",
+    paragraphs: [
+      `Bedankt voor je abonnement! Je Premium staat aan en wordt ${period} automatisch verlengd.`,
+      "Opzeggen kan altijd via je account, in twee klikken. Binnen 14 dagen kun je de overeenkomst ook herroepen: dan krijg je het hele bedrag terug.",
+      `De voorwaarden lees en bewaar je hier: ${params.termsUrl}`,
+    ],
+    action: { url: params.manageUrl, label: "Abonnement beheren" },
+  });
+}
+
+export function cancellationScheduledEmail(params: { to: string; endsOn: string; manageUrl: string }): Email {
+  return billingEmail({
+    to: params.to,
+    subject: `Je abonnement bij ${siteConfig.name} is opgezegd`,
+    preheader: `Premium loopt nog tot en met ${params.endsOn}.`,
+    paragraphs: [
+      "We hebben je opzegging ontvangen. Je hoeft verder niets te doen.",
+      `Je houdt Premium tot en met ${params.endsOn}. Daarna gaat je account over naar Gratis en betaal je niets meer. Je gegevens blijven bewaard.`,
+      "Bedacht? Tot die datum kun je de opzegging in je account weer intrekken.",
+    ],
+    action: { url: params.manageUrl, label: "Naar mijn abonnement" },
+  });
+}
+
+export function paymentFailedEmail(params: { to: string; manageUrl: string }): Email {
+  return billingEmail({
+    to: params.to,
+    subject: `Je betaling voor ${siteConfig.name} is niet gelukt`,
+    preheader: "Geen zorgen: je Premium loopt nog even door.",
+    paragraphs: [
+      "De laatste betaling voor je Premium-abonnement is niet gelukt. Dat kan gebeuren, bijvoorbeeld als een pas is verlopen.",
+      "We proberen het de komende dagen automatisch opnieuw en je Premium loopt zolang door. Wil je zeker zijn? Controleer dan je betaalmethode.",
+    ],
+    action: { url: params.manageUrl, label: "Betaalmethode controleren" },
+  });
+}
+
+export function withdrawalConfirmedEmail(params: { to: string; refunded: string | null }): Email {
+  return billingEmail({
+    to: params.to,
+    subject: `Je hebt je abonnement bij ${siteConfig.name} herroepen`,
+    preheader: "Je herroeping is verwerkt.",
+    paragraphs: [
+      "Je hebt je Premium-abonnement herroepen. Het abonnement is direct gestopt en er wordt niets meer afgeschreven.",
+      params.refunded
+        ? `We betalen ${params.refunded} terug. Dat staat meestal binnen 5 tot 10 werkdagen op je rekening.`
+        : "Er was nog niets betaald, dus er hoeft ook niets terug.",
+      "Je account blijft bestaan, met het Gratis plan.",
+    ],
+  });
+}

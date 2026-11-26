@@ -340,6 +340,8 @@ function isPremium(profile, subscription, now = new Date()): boolean {
 
 De Gratis-grenzen (3 avonden, 1 winkel, 1 wissel) worden **op de server** afgedwongen, niet alleen in de interface.
 
+**Gebouwd (november 2026):** `lib/billing/entitlements.ts` (`premiumAccess`/`isPremium`, herroepingstermijn tot en met dag 14 na de start in Amsterdamse datums), `lib/billing/access.ts` (de controle per verzoek) en de grens van 3 avonden in `app/actions/plan.ts`. Die grens geldt alleen zolang Premium te koop is (Supabase- én Stripe-sleutels gezet); anders is alles gratis. De accountpagina is `/account/abonnement` (`/account` verwijst daarheen), zodat opzeggen na het inloggen hooguit twee klikken kost. Herroepen betaalt eerst terug en stopt dan het abonnement, met idempotentiesleutels, zodat opnieuw proberen nooit dubbel terugbetaalt.
+
 ## Stripe-koppeling
 
 | Moment | Actie |

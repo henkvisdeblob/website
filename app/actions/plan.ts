@@ -11,6 +11,9 @@ import { getStoreDeals } from "@/lib/deals/live";
 import { buildOffers } from "@/lib/deals/offers";
 import { planWeek, type ChildAge, type PlanResult } from "@/lib/planner";
 import { createRateLimiter } from "@/lib/server/rate-limit";
+import { currentVisitorIsPremium } from "@/lib/billing/access";
+import { FREE_DINNER_LIMIT } from "@/lib/billing/limits";
+import { billingEnabled } from "@/lib/billing/stripe";
 
 const ALLERGENS = ["gluten", "melk", "ei", "vis", "schaaldieren", "soja", "noten"] as const;
 
@@ -30,7 +33,7 @@ const planFormSchema = z.object({
 
 export type PlanState =
   | { status: "idle" }
-  | { status: "error"; message: string }
+  | { status: "error"; message: string; upgrade?: boolean }
   | { status: "ok"; plan: PlanResult; storeName: string; dataSource: "prijsprofeet" | "sample" | "none"; variant: number };
 
 const limiter = createRateLimiter({ limit: Number(process.env.PLAN_RATE_LIMIT ?? 60), windowMs: 10 * 60 * 1000 });
@@ -60,16 +63,27 @@ export async function planWeekAction(_prev: PlanState, formData: FormData): Prom
   }
 
   const input = parsed.data;
+  const now = new Date();
+  // Premium limit, checked on the server. Only while Premium can actually be bought; otherwise all free.
+  if (input.dinners > FREE_DINNER_LIMIT && billingEnabled() && !(await currentVisitorIsPremium(now))) {
+    return {
+      status: "error",
+      upgrade: true,
+      message: `Met Gratis maak je een menu voor ${FREE_DINNER_LIMIT} avonden. Voor 4 tot 7 avonden heb je Premium nodig; een nieuw account krijgt 14 dagen Premium gratis.`,
+    };
+  }
   const store = getStore(input.store)!;
-  const today = todayInAmsterdam(new Date());
+  const today = todayInAmsterdam(now);
   const shopDate = addDays(today, input.dayOffset);
 
   let dataSource: "prijsprofeet" | "sample" | "none" = "none";
   let offers: ReturnType<typeof buildOffers> = [];
   try {
     const result = await getStoreDeals(store.id, today);
-    dataSource = result.source;
-    offers = buildOffers(result.deals, INGREDIENTS);
+    if (!result.failed) {
+      dataSource = result.source;
+      offers = buildOffers(result.deals, INGREDIENTS);
+    }
   } catch (error) {
     console.error("[plan] could not load deals", error);
   }

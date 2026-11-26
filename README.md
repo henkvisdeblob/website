@@ -75,7 +75,10 @@ Controles: `npm run lint`, `npm run typecheck`, `npm test` (unit) en `npm run te
 
 ## Live zetten (fase 0)
 
-1. **Supabase** — maak een gratis project aan in regio *Central EU (Frankfurt)*. Open de SQL-editor en voer `supabase/migrations/20261124000000_waitlist.sql` uit. Noteer de project-URL en de *secret key* (Project Settings → API Keys).
+1. **Supabase** — maak een gratis project aan in regio *Central EU (Frankfurt)*. Open de SQL-editor en voer de bestanden in `supabase/migrations/` uit, op volgorde van naam. Noteer de project-URL, de *publishable key* en de *secret key* (Project Settings → API Keys). Voor de accounts (inloggen met een link in je mail):
+   - *Authentication → URL Configuration*: zet *Site URL* op je domein en voeg `https://jouwdomein.nl/auth/confirm` toe bij *Redirect URLs*.
+   - *Authentication → Emails → Magic link*: vervang de link in de mail door `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next={{ .RedirectTo }}`. Dan werkt de link ook als iemand hem op een ander apparaat opent. Zet de tekst van de mail in het Nederlands.
+   - *Authentication → Emails → SMTP Settings*: stel Brevo in als afzender. De ingebouwde mailserver van Supabase verstuurt maar een paar mails per uur.
 2. **Brevo** — maak een account, verifieer het afzenderadres (en liefst je domein), en maak een API-sleutel aan.
 3. **PrijsProfeet** (de aanbiedingen) — werkt al zonder sleutel, maar met een gratis sleutel krijg je een eigen, hogere limiet. Zonder sleutel geldt de limiet per IP-adres, en dat deel je op Vercel met andere sites.
    1. Lees de voorwaarden op prijsprofeet.nl in je browser. Controleer dat hun data achter een betaalmuur (Premium) mag, met bronvermelding. Twijfel je, mail ze dan en bewaar het antwoord.
@@ -84,11 +87,26 @@ Controles: `npm run lint`, `npm run typecheck`, `npm test` (unit) en `npm run te
    4. Laat "Aanbiedingen via PrijsProfeet" op de site staan: die bronvermelding hoort bij het gratis plan.
 
    Deel de sleutel nooit in een chat, issue of commit. Je beheert hem op https://www.prijsprofeet.nl/api-account/.
-4. **Vercel** — importeer deze GitHub-repository. Vul bij *Environment Variables* de waarden uit `.env.example` in: `NEXT_PUBLIC_SITE_URL` (je domein), `NEXT_PUBLIC_OWNER_NAME`, `NEXT_PUBLIC_CONTACT_EMAIL`, `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `BREVO_API_KEY`, `EMAIL_FROM` en `PRIJSPROFEET_API_KEY`. Laat `DEALS_SOURCE` leeg (dat is alleen voor tests). Let op: voor commercieel gebruik vraagt Vercel het Pro-plan.
+4. **Vercel** — importeer deze GitHub-repository. Vul bij *Environment Variables* de waarden uit `.env.example` in: `NEXT_PUBLIC_SITE_URL` (je domein), `NEXT_PUBLIC_OWNER_NAME`, `NEXT_PUBLIC_CONTACT_EMAIL`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, `BREVO_API_KEY`, `EMAIL_FROM` en `PRIJSPROFEET_API_KEY`. Laat `DEALS_SOURCE` leeg (dat is alleen voor tests). Let op: voor commercieel gebruik vraagt Vercel het Pro-plan.
 5. **Plausible** (optioneel) — voeg je domein toe en zet de script-URL in `NEXT_PUBLIC_PLAUSIBLE_SCRIPT_SRC`.
 6. **Controleer** de privacyverklaring op `/privacy`: zolang naam of contactadres ontbreekt, staat daar een gemarkeerd plekje.
 
 Zonder Supabase- en Brevo-sleutels weigert de productieversie aanmeldingen, zodat er nooit stilletjes aanmeldingen verloren gaan.
+
+### Premium (Stripe)
+
+Het abonnementssysteem is ingebouwd, maar staat uit zolang de Stripe-sleutels ontbreken: dan is alles gratis en gelden er geen grenzen. Met sleutels kunnen ingelogde gebruikers Premium afsluiten (maand of jaar), online opzeggen in twee klikken, binnen 14 dagen herroepen (met volledige terugbetaling) en hun account verwijderen. Zonder Premium maak je een menu voor maximaal 3 avonden.
+
+**Echte betalingen pas na inschrijving bij de KvK.** Er is geen omzetgrens: zodra je met winstoogmerk abonnementen verkoopt, ben je ondernemer en moet je ingeschreven zijn (zie [docs/09](docs/09-juridisch-en-administratie.md)). Tot die tijd test je met de testsleutels van Stripe; daarmee wordt geen echt geld afgeschreven.
+
+1. Maak een Stripe-account. Werk in **testmodus** (schakelaar rechtsboven).
+2. *Product catalog*: maak het product "Premium" met twee terugkerende prijzen in euro's, **inclusief btw**: €3,99 per maand en €34,99 per jaar. Noteer beide prijs-ID's (`price_…`).
+3. *Settings → Payment methods*: zet iDEAL | Wero, kaart en SEPA-incasso aan.
+4. *Settings → Billing → Customer portal*: zet "betaalmethode wijzigen" en "facturen bekijken" aan, en opzeggen "aan het einde van de periode".
+5. *Settings → Billing → Subscriptions and emails*: zet de herinneringsmail vóór de verlenging van een jaarabonnement aan, en "Smart Retries" voor mislukte betalingen.
+6. *Developers → Webhooks*: voeg `https://jouwdomein.nl/api/stripe/webhook` toe met de events `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted` en `invoice.payment_failed`. Noteer het *signing secret* (`whsec_…`).
+7. Zet in Vercel: `STRIPE_SECRET_KEY` (`sk_test_…`), `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_MONTHLY`, `STRIPE_PRICE_YEARLY`, en vul `NEXT_PUBLIC_OWNER_ADDRESS` en `NEXT_PUBLIC_KVK_NUMBER` in zodra je die hebt. Op de accountpagina staat dan een melding "Testmodus".
+8. Laat de [voorwaarden](app/voorwaarden/page.tsx) en de privacyverklaring nakijken door een jurist voordat je overstapt op de live sleutels (`sk_live_…`).
 
 Staat er in de Vercel-logs `[deals] PrijsProfeet: Invalid API key`, dan klopt de sleutel in Vercel niet (tikfout of ingetrokken). De site blijft dan werken, maar zonder sleutel.
 

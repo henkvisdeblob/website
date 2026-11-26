@@ -40,13 +40,14 @@ export function isIsoDate(value: string): value is IsoDate {
 }
 
 /** "zaterdag 28 november" */
-export function formatDateNl(date: IsoDate, options: { weekday?: boolean } = { weekday: true }): string {
+export function formatDateNl(date: IsoDate, options: { weekday?: boolean; year?: boolean } = { weekday: true }): string {
   const [y, m, d] = date.split("-").map(Number);
   return new Intl.DateTimeFormat("nl-NL", {
     timeZone: "UTC",
     weekday: options.weekday ? "long" : undefined,
     day: "numeric",
     month: "long",
+    year: options.year ? "numeric" : undefined,
   }).format(new Date(Date.UTC(y, m - 1, d)));
 }
 
@@ -56,4 +57,9 @@ export function shortWeekdayNl(date: IsoDate): string {
   return new Intl.DateTimeFormat("nl-NL", { timeZone: "UTC", weekday: "short" })
     .format(new Date(Date.UTC(y, m - 1, d)))
     .replace(".", "");
+}
+
+/** Formats an instant (ISO timestamp) as its Amsterdam calendar date, by default like "20 december 2026". */
+export function formatInstantNl(iso: string, options: { weekday?: boolean; year?: boolean } = { year: true }): string {
+  return formatDateNl(todayInAmsterdam(new Date(iso)), options);
 }

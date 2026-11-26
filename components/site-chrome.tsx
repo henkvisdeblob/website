@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Logo } from "@/components/logo";
+import { accountsEnabled } from "@/lib/auth/session";
 import { Container, ButtonLink } from "@/components/ui";
 import { siteConfig } from "@/lib/site-config";
 
@@ -14,14 +15,26 @@ export function SiteHeader({ cta = true, current }: { cta?: boolean; current?: "
         {cta && (
           <nav aria-label="Hoofdmenu" className="flex items-center gap-3 sm:gap-5">
             {current === "weekmenu" ? (
-              <ButtonLink href="/#wachtlijst" variant="secondarySmall">
-                Op de wachtlijst
-              </ButtonLink>
+              accountsEnabled() ? (
+                <ButtonLink href="/account/abonnement" variant="secondarySmall">
+                  Account
+                </ButtonLink>
+              ) : (
+                <ButtonLink href="/#wachtlijst" variant="secondarySmall">
+                  Op de wachtlijst
+                </ButtonLink>
+              )
             ) : (
               <>
-                <Link href="/#wachtlijst" className="hidden text-sm font-semibold text-fg underline-offset-4 hover:underline sm:inline">
-                  Wachtlijst
-                </Link>
+                {accountsEnabled() ? (
+                  <Link href="/account/abonnement" className="text-sm font-semibold text-fg underline-offset-4 hover:underline">
+                    Account
+                  </Link>
+                ) : (
+                  <Link href="/#wachtlijst" className="hidden text-sm font-semibold text-fg underline-offset-4 hover:underline sm:inline">
+                    Wachtlijst
+                  </Link>
+                )}
                 <ButtonLink href="/weekmenu" variant="primarySmall">
                   Weekmenu maken
                 </ButtonLink>
@@ -55,6 +68,9 @@ export function SiteFooter() {
           <Link href="/privacy" className="underline-offset-4 hover:text-fg hover:underline">
             Privacyverklaring
           </Link>
+          <Link href="/voorwaarden" className="underline-offset-4 hover:text-fg hover:underline">
+            Voorwaarden
+          </Link>
           {siteConfig.contactEmail && (
             <a
               href={`mailto:${siteConfig.contactEmail}`}
@@ -84,7 +100,10 @@ export function SimplePage({ children, narrow = true }: { children: ReactNode; n
     <>
       <SiteHeader cta={false} />
       <main id="inhoud" className="flex-1 py-12 md:py-20">
-        <Container className={narrow ? "max-w-2xl" : ""}>{children}</Container>
+        <Container>
+          {/* A narrow reading column inside the page container (max-w on Container itself would conflict). */}
+          <div className={narrow ? "max-w-2xl" : ""}>{children}</div>
+        </Container>
       </main>
       <SiteFooter />
     </>

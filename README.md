@@ -77,10 +77,19 @@ Controles: `npm run lint`, `npm run typecheck`, `npm test` (unit) en `npm run te
 
 1. **Supabase** — maak een gratis project aan in regio *Central EU (Frankfurt)*. Open de SQL-editor en voer `supabase/migrations/20261124000000_waitlist.sql` uit. Noteer de project-URL en de *secret key* (Project Settings → API Keys).
 2. **Brevo** — maak een account, verifieer het afzenderadres (en liefst je domein), en maak een API-sleutel aan.
-3. **Vercel** — importeer deze GitHub-repository. Vul bij *Environment Variables* de waarden uit `.env.example` in: `NEXT_PUBLIC_SITE_URL` (je domein), `NEXT_PUBLIC_OWNER_NAME`, `NEXT_PUBLIC_CONTACT_EMAIL`, `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `BREVO_API_KEY`, `EMAIL_FROM`. Let op: voor commercieel gebruik vraagt Vercel het Pro-plan.
-4. **Plausible** (optioneel) — voeg je domein toe en zet de script-URL in `NEXT_PUBLIC_PLAUSIBLE_SCRIPT_SRC`.
-5. **Controleer** de privacyverklaring op `/privacy`: zolang naam of contactadres ontbreekt, staat daar een gemarkeerd plekje.
+3. **PrijsProfeet** (de aanbiedingen) — werkt al zonder sleutel, maar met een gratis sleutel krijg je een eigen, hogere limiet. Zonder sleutel geldt de limiet per IP-adres, en dat deel je op Vercel met andere sites.
+   1. Lees de voorwaarden op prijsprofeet.nl in je browser. Controleer dat hun data achter een betaalmuur (Premium) mag, met bronvermelding. Twijfel je, mail ze dan en bewaar het antwoord.
+   2. Vraag een gratis sleutel aan via het formulier op https://www.prijsprofeet.nl/api#gratis-key: je e-mailadres en een projectnaam (bijvoorbeeld "Potje"). Je krijgt een mail met een link, en daarachter staat je sleutel. Dit kan alleen via dat formulier.
+   3. Zet de sleutel in `.env.local` als `PRIJSPROFEET_API_KEY=…` (dat bestand gaat nooit mee in Git) en draai `npm run check:deals`. Je ziet of de sleutel geldig is, welk plan erbij hoort en per supermarkt hoeveel aanbiedingen binnenkomen. Staat er `Key OK` en drie keer `OK`, dan ben je klaar.
+   4. Laat "Aanbiedingen via PrijsProfeet" op de site staan: die bronvermelding hoort bij het gratis plan.
+
+   Deel de sleutel nooit in een chat, issue of commit. Je beheert hem op https://www.prijsprofeet.nl/api-account/.
+4. **Vercel** — importeer deze GitHub-repository. Vul bij *Environment Variables* de waarden uit `.env.example` in: `NEXT_PUBLIC_SITE_URL` (je domein), `NEXT_PUBLIC_OWNER_NAME`, `NEXT_PUBLIC_CONTACT_EMAIL`, `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `BREVO_API_KEY`, `EMAIL_FROM` en `PRIJSPROFEET_API_KEY`. Laat `DEALS_SOURCE` leeg (dat is alleen voor tests). Let op: voor commercieel gebruik vraagt Vercel het Pro-plan.
+5. **Plausible** (optioneel) — voeg je domein toe en zet de script-URL in `NEXT_PUBLIC_PLAUSIBLE_SCRIPT_SRC`.
+6. **Controleer** de privacyverklaring op `/privacy`: zolang naam of contactadres ontbreekt, staat daar een gemarkeerd plekje.
 
 Zonder Supabase- en Brevo-sleutels weigert de productieversie aanmeldingen, zodat er nooit stilletjes aanmeldingen verloren gaan.
+
+Staat er in de Vercel-logs `[deals] PrijsProfeet: Invalid API key`, dan klopt de sleutel in Vercel niet (tikfout of ingetrokken). De site blijft dan werken, maar zonder sleutel.
 
 Richtlijnen voor wie (mens of AI) code schrijft in deze repository staan in [CLAUDE.md](CLAUDE.md). Het ontwerpsysteem staat in [DESIGN.md](DESIGN.md).

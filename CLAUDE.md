@@ -29,7 +29,7 @@ The full product specification lives in `docs/` (in Dutch). Read the relevant do
 | `lib/waitlist/`, `lib/email/` | Waitlist (double opt-in) and email |
 | `app/actions/` | Server actions (`plan.ts`, `waitlist.ts`) |
 | `app/weekmenu/`, `components/planner/` | The planner page |
-| `scripts/` | Dev tools: `match-report.ts` (how deals match), `plan-preview.ts` (plan from a deal dump). Run with `npx tsx`. Never commit deal dumps. |
+| `scripts/` | Dev tools: `match-report.ts` (how deals match), `plan-preview.ts` (plan from a deal dump), `check-deals.ts` (live source + key check, `npm run check:deals`). Run with `npx tsx`. Never commit deal dumps. |
 
 When adding recipes: use only ingredient ids from `lib/catalog/ingredients.ts`, amounts for 4 servings, own texts. When matching misses or mismatches products, adjust `keywords`/`exclude` on the ingredient and check with `scripts/match-report.ts`.
 
@@ -84,6 +84,7 @@ npm run typecheck    # generates route types (PageProps/LayoutProps), then tsc
 npm test             # Vitest unit tests (tests/unit)
 npm run test:e2e     # Playwright (tests/e2e), uses the preinstalled Chromium 1.63
 npm run build
+npm run check:deals  # checks the live PrijsProfeet source and whether the API key is accepted
 ```
 
 Without Supabase/Brevo env vars the waitlist runs in development with an in-memory store and prints emails to the console. Copy `.env.example` to `.env.local` to use real services. `DEALS_SOURCE=sample` uses fictional deals (the e2e tests do this). Behind an HTTPS proxy, run Next with `NODE_USE_ENV_PROXY=1` so server-side `fetch` can reach PrijsProfeet.
